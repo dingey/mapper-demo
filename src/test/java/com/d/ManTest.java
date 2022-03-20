@@ -201,4 +201,18 @@ public class ManTest extends AbstractTest {
         List<Man> men3 = manMapper.listByIds(set);
         System.out.println(JsonUtil.toJson(men3));
     }
+
+    @Test
+    public void in() {
+        MysqlSelect<Man> select = new MysqlSelect<Man>()
+                .in(Man::getId, 1, 2, 3)
+                .between(Boolean.FALSE, Man::getId, 1, 9)
+                .like(Boolean.TRUE, Man::getName, "%A%")
+                .isNotNull(Man::getIsDel).limit(1);
+        List<Man> men = manMapper.selectList(select);
+        System.out.println(JsonUtil.toJson(men));
+
+        Man man = manMapper.selectOne(select);
+        System.out.println(JsonUtil.toJson(man));
+    }
 }
