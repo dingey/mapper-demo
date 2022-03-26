@@ -3,8 +3,8 @@ package com.d;
 import com.d.mapper.ManMapper;
 import com.d.model.IdName;
 import com.d.model.Man;
-import com.d.util.MapUtils;
 import com.github.dingey.common.util.JsonUtil;
+import com.github.dingey.common.util.MapUtil;
 import com.github.dingey.mybatis.mapper.lambda.*;
 import lombok.Data;
 import org.junit.Assert;
@@ -73,7 +73,7 @@ public class ManTest extends AbstractTest {
                 .ge(Man::getId, 1));
         System.out.println(JsonUtil.toJson(maps));
         Assert.assertNotEquals(0, maps.size());
-        List<IdName> idNames = MapUtils.toObjects(maps, IdName.class);
+        List<IdName> idNames = MapUtil.toObjects(maps, IdName.class);
         System.out.println(JsonUtil.toJson(idNames));
     }
 
