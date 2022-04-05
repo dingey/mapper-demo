@@ -102,6 +102,15 @@ public class ManTest extends AbstractTest {
     }
 
     @Test
+    public void updateById() {
+        Man man = new Man()
+                .setId(1L)
+                .setAge(777);
+        int update = manMapper.updateById(man);
+        Assert.assertNotEquals(0, update);
+    }
+
+    @Test
     public void updatePlus() {
         Update<Man> update1 = new Update<>();
         update1.set(Man::getAge, update1.val(Man::getAge).plus(1))
@@ -127,6 +136,31 @@ public class ManTest extends AbstractTest {
         Assert.assertEquals(java.util.Optional.of(m1.getAge() * 5).get(), m2.getAge());
     }
 
+    @Test
+    public void insert() {
+        Man m = new Man()
+                .setName("Alice")
+                .setAge(18)
+                .setSex(1)
+                .setCreated(LocalDateTime.now())
+                .setIsDel(0)
+                .setUpdated(LocalDateTime.now());
+        int executeInsert = manMapper.insert(m);
+        Assert.assertEquals(1, executeInsert);
+    }
+
+    @Test
+    public void insertBatch() {
+        Man m = new Man()
+                .setName("Alice")
+                .setAge(18)
+                .setSex(1)
+                .setCreated(LocalDateTime.now())
+                .setIsDel(0)
+                .setUpdated(LocalDateTime.now());
+        int executeInsert = manMapper.insertBatch(Collections.singletonList(m));
+        Assert.assertEquals(1, executeInsert);
+    }
 
     @Test
     public void executeInsert() {
