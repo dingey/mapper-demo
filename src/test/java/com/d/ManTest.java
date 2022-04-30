@@ -21,32 +21,25 @@ public class ManTest extends AbstractTest {
     private ManMapper manMapper;
 
     @Test
+    public void getById() {
+        Man man = manMapper.getById(1L);
+        System.out.println(JsonUtil.toJson(man));
+        Assert.assertNotNull(man);
+    }
+
+    @Test
+    public void get() {
+        Man man = manMapper.get(new Man().setId(1L));
+        System.out.println(JsonUtil.toJson(man));
+        Assert.assertNotNull(man);
+    }
+
+    @Test
     public void list2Col() {
         List<Man> men = manMapper.selectList(new Select<Man>()
                 .select(Man::getId, Man::getName));
         System.out.println(JsonUtil.toJson(men));
         Assert.assertNotEquals(0, men.size());
-    }
-
-    @Test
-    public void selectCount() {
-        long count = manMapper.selectCount(new Select<Man>()
-                .select(Man::getId, Man::getName));
-        System.out.println(JsonUtil.toJson(count));
-        Assert.assertNotEquals(0, count);
-    }
-
-    @Test
-    public void group() {
-        Select<Man> select = new Select<>();
-        select
-                .select(Man::getSex)
-                .select(select.max(Man::getAge))
-                .groupBy(Man::getSex).having(select.max(Man::getAge).ge(1));
-
-        List<Map<String, Object>> maps = manMapper.selectMaps(select);
-        System.out.println(JsonUtil.toJson(maps));
-        Assert.assertNotEquals(0, maps.size());
     }
 
     @Test
@@ -77,10 +70,41 @@ public class ManTest extends AbstractTest {
         System.out.println(JsonUtil.toJson(idNames));
     }
 
+    @Test
+    public void listByIds() {
+        List<Long> longs = Arrays.asList(1L, 2L);
+        List<Man> men = manMapper.listByIds(longs);
+        System.out.println(JsonUtil.toJson(men));
+        Assert.assertNotEquals(0, men.size());
+
+        List<Integer> integers = Arrays.asList(1, 2);
+        List<Man> men2 = manMapper.listByIds(integers);
+        System.out.println(JsonUtil.toJson(men2));
+
+        Set<String> set = Collections.singleton("3");
+        List<Man> men3 = manMapper.listByIds(set);
+        System.out.println(JsonUtil.toJson(men3));
+    }
+
     @Data
     public static class IsDelCount {
         private Integer isDel;
         private Integer count;
+    }
+
+    @Test
+    public void selectById() {
+        Man man = manMapper.selectById(1L);
+        System.out.println(JsonUtil.toJson(man));
+        Assert.assertNotNull(man);
+    }
+
+    @Test
+    public void selectCount() {
+        long count = manMapper.selectCount(new Select<Man>()
+                .select(Man::getId, Man::getName));
+        System.out.println(JsonUtil.toJson(count));
+        Assert.assertNotEquals(0, count);
     }
 
     @Test
@@ -101,6 +125,34 @@ public class ManTest extends AbstractTest {
         Assert.assertNotEquals(0, map.size());
     }
 
+
+    @Test
+    public void select() {
+        MysqlSelect<Man> select = new MysqlSelect<Man>()
+                .in(Man::getId, 1, 2, 3)
+                .between(Boolean.FALSE, Man::getId, 1, 9)
+                .like(Boolean.TRUE, Man::getName, "%A%")
+                .isNotNull(Man::getIsDel).limit(1);
+        List<Man> men = manMapper.selectList(select);
+        System.out.println(JsonUtil.toJson(men));
+
+        Man man = manMapper.selectOne(select);
+        System.out.println(JsonUtil.toJson(man));
+    }
+
+    @Test
+    public void group() {
+        Select<Man> select = new Select<>();
+        select
+                .select(Man::getSex)
+                .select(select.max(Man::getAge))
+                .groupBy(Man::getSex).having(select.max(Man::getAge).ge(1));
+
+        List<Map<String, Object>> maps = manMapper.selectMaps(select);
+        System.out.println(JsonUtil.toJson(maps));
+        Assert.assertNotEquals(0, maps.size());
+    }
+
     @Test
     public void updateById() {
         Man man = new Man()
@@ -114,7 +166,7 @@ public class ManTest extends AbstractTest {
     public void updatePlus() {
         Update<Man> update1 = new Update<>();
         update1.set(Man::getAge, update1.val(Man::getAge).plus(1))
-                .eq(Man::getId, 1);
+                .in(Man::getId, 1);
         int update = manMapper.update(update1);
         Assert.assertNotEquals(0, update);
     }
@@ -134,6 +186,14 @@ public class ManTest extends AbstractTest {
         System.out.println("after " + m2);
 
         Assert.assertEquals(java.util.Optional.of(m1.getAge() * 5).get(), m2.getAge());
+    }
+
+    @Test
+    public void delete() {
+        Delete<Man> delete = new Delete<>();
+        delete.in(Man::getId, 5, 6, 7);
+        int update = manMapper.delete(delete);
+        Assert.assertNotEquals(0, update);
     }
 
     @Test
@@ -220,33 +280,4 @@ public class ManTest extends AbstractTest {
         Assert.assertNotEquals(0, maps.size());
     }
 
-    @Test
-    public void listByIds() {
-        List<Long> longs = Arrays.asList(1L, 2L);
-        List<Man> men = manMapper.listByIds(longs);
-        System.out.println(JsonUtil.toJson(men));
-        Assert.assertNotEquals(0, men.size());
-
-        List<Integer> integers = Arrays.asList(1, 2);
-        List<Man> men2 = manMapper.listByIds(integers);
-        System.out.println(JsonUtil.toJson(men2));
-
-        Set<String> set = Collections.singleton("3");
-        List<Man> men3 = manMapper.listByIds(set);
-        System.out.println(JsonUtil.toJson(men3));
-    }
-
-    @Test
-    public void in() {
-        MysqlSelect<Man> select = new MysqlSelect<Man>()
-                .in(Man::getId, 1, 2, 3)
-                .between(Boolean.FALSE, Man::getId, 1, 9)
-                .like(Boolean.TRUE, Man::getName, "%A%")
-                .isNotNull(Man::getIsDel).limit(1);
-        List<Man> men = manMapper.selectList(select);
-        System.out.println(JsonUtil.toJson(men));
-
-        Man man = manMapper.selectOne(select);
-        System.out.println(JsonUtil.toJson(man));
-    }
 }
